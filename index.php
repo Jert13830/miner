@@ -75,7 +75,7 @@ function getButtonClick(){
             case 'right':
             
 
-            if ($_SESSION["playerPos"][1]+1 !== count($_SESSION["board_array"][0]) && collision($_SESSION["playerPos"][0],$_SESSION["playerPos"][1]+1)){
+                if ($_SESSION["playerPos"][1]+1 !== count($_SESSION["board_array"][0]) && collision($_SESSION["playerPos"][0],$_SESSION["playerPos"][1]+1)){
                     $_SESSION["board_array"][$_SESSION["playerPos"][0]][$_SESSION["playerPos"][1]+1]= "m";
                     $_SESSION["board_array"][$_SESSION["playerPos"][0]][$_SESSION["playerPos"][1]]= ""; 
                 }
@@ -202,12 +202,12 @@ function getButtonClick(){
                 <div id="navigation">
                     <form method="post">
                         <div id="formDiv">
-                            <div><button name="buttons" value="up" id="btnUp">Up</button></div>
+                            <div><button  name="buttons" value="up" id="btnUp"><img class="btnDir"  src="./assets/images/AxeUp.png" alt="Axe up"></button></div>
                             <div id="btnLeftRight">
-                                <div><button name="buttons" value="left" id="btnLeft">Left</button></div>
-                                <div><button name="buttons" value="right" id="btnRight">Right</button></div>
+                                <div><button name="buttons" value="left" id="btnLeft"><img class="btnDir" src="./assets/images/bootLeft.png" alt="Left Boot"></button></div>
+                                <div><button name="buttons" value="right" id="btnRight"><img class="btnDir"  src="./assets/images/bootRight.png" alt="Right Boot"></button></div>
                             </div>
-                            <div><button name="buttons" value="down" id="btnDown">Down</button></div>
+                            <div><button name="buttons" value="down" id="btnDown"><img class="btnDir" src="./assets/images/axeDown.png" alt="Axe down"></button></div>
                             <div>
                                 <button name="btnReset" value="reset" id="btnReset">Reset</button>
                             </div>
