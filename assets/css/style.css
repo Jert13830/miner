@@ -51,11 +51,27 @@
 }
 
 #board{
-    display:flex;
+    position: relative;  /* Make board the reference */
+    display: flex;
     justify-content: center;
     width: 50%;
     flex-wrap: wrap;
     padding-top:10px;
+    background-color: beige;
+}
+
+#userMessage{
+  position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    /*display: none;  hidden by default */
+    background: rgba(0,0,0,0.7);
+    color: white;
+    padding: 10px 15px;
+    border-radius: 8px;
+    text-align: center;
+    max-width: 80%;
 }
 
 .boardSquare{
@@ -66,9 +82,7 @@
     display:flex;
 }
 
-#userMessage{
-    padding-bottom: 5px;
-}
+
 
 @media only screen and (max-width: 750px) {
     #mainDisplay{
@@ -81,3 +95,4 @@
         width: 80%;
     }
 }
+

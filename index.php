@@ -13,38 +13,81 @@
                     ["r","","","r","r"],
                     ];
 
+    $board_array2 = [["r","","","","r",""],
+                    ["r","","r","","",""],
+                    ["r","","m","","",""],
+                    ["","","","r","r",""],
+                    ["","r","","","","r"],
+                    ["r","","g","r","","r"],
+                    ["r","","","r","r",""],
+                    ["r","","","r","r",""],
+                    ];                
+
    // Only set the board if it doesn't exist yet
 if (!isset($_SESSION["board_array"])) {
     $_SESSION["board_array"] = $board_array1;
+    
 } 
+
+$_SESSION["display"] = "none";
+$_SESSION["user_message"] = "";
+
 
     // Move RIGHT
     if (isset($_POST["btnRight"])){
         $player = getPlayer($_SESSION["board_array"]);
-        if ()
-        $_SESSION["board_array"][$player[0]][$player[1]+1]= "m";
-        $_SESSION["board_array"][$player[0]][$player[1]]= ""; 
+
+        if ($player[1]+1 !== count($_SESSION["board_array"][0])){
+            $_SESSION["board_array"][$player[0]][$player[1]+1]= "m";
+            $_SESSION["board_array"][$player[0]][$player[1]]= ""; 
+        }
+        else
+        {
+            $_SESSION["display"] = "block";
+            $_SESSION["user_message"] = "You can't go in that direction.";
+        }
+        
     }
 
     // Move LEFT
     if (isset($_POST["btnLeft"])){
         $player = getPlayer($_SESSION["board_array"]);
-        $_SESSION["board_array"][$player[0]][$player[1]-1]= "m";
-        $_SESSION["board_array"][$player[0]][$player[1]]= ""; 
+
+        if ($player[1] !== 0){
+            $_SESSION["board_array"][$player[0]][$player[1]-1]= "m";
+            $_SESSION["board_array"][$player[0]][$player[1]]= ""; 
+        }
+        else
+        {
+            $_SESSION["display"] = "block";
+            $_SESSION["user_message"] = "You can't go in that direction.";
+        }
     }
 
     // Move UP
     if (isset($_POST["btnUp"])){
         $player = getPlayer($_SESSION["board_array"]);
-        $_SESSION["board_array"][$player[0]-1][$player[1]]= "m";
-        $_SESSION["board_array"][$player[0]][$player[1]]= ""; 
+        if ($player[0] !== 0){
+             $_SESSION["board_array"][$player[0]-1][$player[1]]= "m";
+             $_SESSION["board_array"][$player[0]][$player[1]]= ""; 
+        }else
+        {
+             $_SESSION["display"] = "block";
+            $_SESSION["user_message"] = "You can't go in that direction.";
+        }
     }
 
     // Move DOWN
     if (isset($_POST["btnDown"])){
         $player = getPlayer($_SESSION["board_array"]);
-        $_SESSION["board_array"][$player[0]+1][$player[1]]= "m";
-        $_SESSION["board_array"][$player[0]][$player[1]]= ""; 
+        if ($player[0]+1 !== count($_SESSION["board_array"])){
+            $_SESSION["board_array"][$player[0]+1][$player[1]]= "m";
+            $_SESSION["board_array"][$player[0]][$player[1]]= ""; 
+        }else
+        {
+             $_SESSION["display"] = "block";
+            $_SESSION["user_message"] = "You can't go in that direction.";
+        }
     }
     // RESET game
     if (isset($_POST["btnReset"])){
@@ -96,7 +139,12 @@ if (!isset($_SESSION["board_array"])) {
         <div id="pageContainer">
             <div id="mainDisplay">
                 <div id="board">
-                    <?php drawBoard($_SESSION["board_array"])?>
+                    <div>
+                        <?php drawBoard($_SESSION["board_array"])?>
+                    </div>
+                     <div id="userMessage" style="display: <?php echo $_SESSION["display"]?>">
+                        <p id="messageText"><?php echo $_SESSION["user_message"] ?></p>
+                     </div>    
                 </div>
                 <div id="navigation">
                     <form method="post">
@@ -107,18 +155,18 @@ if (!isset($_SESSION["board_array"])) {
                                 <div><button name="btnRight" id="btnRight">Right</button></div>
                             </div>
                             <div><button name="btnDown" id="btnDown">Down</button></div>
-                        <div>
-                            <button name="btnReset" id="btnReset">Reset</button>
-                        </div>
+                            <div>
+                                <button name="btnReset" id="btnReset">Reset</button>
+                            </div>
+                       
+                            </div>
                         </div>
                     </form>
 
                 </div>
+                
             </div>
-            <div id="userMessage">
-                <p id="messageText">Messages to the user !!</p>
-            </div>    
-        </div>
+            
     </main>
     
 </body>
