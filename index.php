@@ -2,6 +2,7 @@
 
   if (session_status() === PHP_SESSION_NONE) {
     session_start();
+    
     }
 
    
@@ -29,70 +30,114 @@ if (!isset($_SESSION["board_array"])) {
     
 } 
 
+if (!isset($_SESSION["goldFound"])) {
+    $_SESSION["goldFound"] = false;
+}
+
 $_SESSION["display"] = "none";
 $_SESSION["user_message"] = "";
 
+$_SESSION["goldPos"] = getGold($_SESSION["board_array"]);
+$_SESSION["playerPos"] = getPlayer($_SESSION["board_array"]);
 
-    // Move RIGHT
-    if (isset($_POST["btnRight"])){
-        $player = getPlayer($_SESSION["board_array"]);
 
-        if ($player[1]+1 !== count($_SESSION["board_array"][0])){
-            $_SESSION["board_array"][$player[0]][$player[1]+1]= "m";
-            $_SESSION["board_array"][$player[0]][$player[1]]= ""; 
-        }
-        else
+getButtonClick();
+
+if (isset($_POST["btnReset"])){
+    session_destroy();
+    header("Refresh:0");
+}
+
+
+function collision($row, $col): bool {
+    switch ($_SESSION["board_array"][$row][$col])
+    {
+        case 'r' : 
+            return false;
+            break;
+        case 'g' : 
+            $_SESSION["goldFound"] = true;
+            return true;
+            break;
+        default : 
+            return true;
+    }
+
+}
+
+function getButtonClick(){
+    $is_direction = true;
+
+    if (isset($_POST["buttons"]) && !$_SESSION["goldFound"]){
+        
+        switch (htmlspecialchars($_POST["buttons"]))
         {
-            $_SESSION["display"] = "block";
+            case 'right':
+            
+
+            if ($_SESSION["playerPos"][1]+1 !== count($_SESSION["board_array"][0]) && collision($_SESSION["playerPos"][0],$_SESSION["playerPos"][1]+1)){
+                    $_SESSION["board_array"][$_SESSION["playerPos"][0]][$_SESSION["playerPos"][1]+1]= "m";
+                    $_SESSION["board_array"][$_SESSION["playerPos"][0]][$_SESSION["playerPos"][1]]= ""; 
+                }
+                else
+                {
+                    showMessage("error");
+                }
+            break;
+
+            case 'left':
+                if ($_SESSION["playerPos"][1] !== 0 && $_SESSION["board_array"][$_SESSION["playerPos"][0]][$_SESSION["playerPos"][1]-1] !== "r"){
+                    $_SESSION["board_array"][$_SESSION["playerPos"][0]][$_SESSION["playerPos"][1]-1]= "m";
+                    $_SESSION["board_array"][$_SESSION["playerPos"][0]][$_SESSION["playerPos"][1]]= ""; 
+                }
+                else
+                {
+                    showMessage("error");
+                }
+            break;
+                
+            case 'up':
+                if ($_SESSION["playerPos"][0] !== 0 && $_SESSION["board_array"][$_SESSION["playerPos"][0]-1][$_SESSION["playerPos"][1]] !== "r"){
+                    $_SESSION["board_array"][$_SESSION["playerPos"][0]-1][$_SESSION["playerPos"][1]]= "m";
+                    $_SESSION["board_array"][$_SESSION["playerPos"][0]][$_SESSION["playerPos"][1]]= ""; 
+                }else
+                {
+                    showMessage("error");
+                }
+            break;
+
+            case 'down':
+                if ($_SESSION["playerPos"][0]+1 !== count($_SESSION["board_array"]) && $_SESSION["board_array"][$_SESSION["playerPos"][0]+1][$_SESSION["playerPos"][1]] !== "r"){
+                    $_SESSION["board_array"][$_SESSION["playerPos"][0]+1][$_SESSION["playerPos"][1]]= "m";
+                    $_SESSION["board_array"][$_SESSION["playerPos"][0]][$_SESSION["playerPos"][1]]= ""; 
+                }else
+                {
+                    showMessage("error");
+                }
+            break;
+        }
+
+      
+       // $_SESSION["board_array"][$_SESSION["playerPos"][0]][$_SESSION["playerPos"][1]]= ""; 
+        
+
+        if ($_SESSION["goldFound"]){
+            showMessage("winner");
+            
+        }
+
+    }
+}
+    
+    function showMessage($messageType){
+        $_SESSION["display"] = "block";
+        if ($messageType == "error"){
             $_SESSION["user_message"] = "You can't go in that direction.";
+        }
+        else{
+             $_SESSION["user_message"] = "Your rich. You hit the JACKPOT!!";
         }
         
-    }
-
-    // Move LEFT
-    if (isset($_POST["btnLeft"])){
-        $player = getPlayer($_SESSION["board_array"]);
-
-        if ($player[1] !== 0){
-            $_SESSION["board_array"][$player[0]][$player[1]-1]= "m";
-            $_SESSION["board_array"][$player[0]][$player[1]]= ""; 
-        }
-        else
-        {
-            $_SESSION["display"] = "block";
-            $_SESSION["user_message"] = "You can't go in that direction.";
-        }
-    }
-
-    // Move UP
-    if (isset($_POST["btnUp"])){
-        $player = getPlayer($_SESSION["board_array"]);
-        if ($player[0] !== 0){
-             $_SESSION["board_array"][$player[0]-1][$player[1]]= "m";
-             $_SESSION["board_array"][$player[0]][$player[1]]= ""; 
-        }else
-        {
-             $_SESSION["display"] = "block";
-            $_SESSION["user_message"] = "You can't go in that direction.";
-        }
-    }
-
-    // Move DOWN
-    if (isset($_POST["btnDown"])){
-        $player = getPlayer($_SESSION["board_array"]);
-        if ($player[0]+1 !== count($_SESSION["board_array"])){
-            $_SESSION["board_array"][$player[0]+1][$player[1]]= "m";
-            $_SESSION["board_array"][$player[0]][$player[1]]= ""; 
-        }else
-        {
-             $_SESSION["display"] = "block";
-            $_SESSION["user_message"] = "You can't go in that direction.";
-        }
-    }
-    // RESET game
-    if (isset($_POST["btnReset"])){
-        session_destroy();
-        header("Refresh:0");
     }
 
     function getPlayer($board_array) {
@@ -103,6 +148,13 @@ $_SESSION["user_message"] = "";
         }
     }
 
+    function getGold($board_array) {
+        for ($i=0; $i < count($board_array) ;$i++){
+            for ($j=0; $j < count($board_array[$i]);$j++){
+                if ($board_array[$i][$j]=== "g" ) return [$i,$j];
+            }
+        }
+    }
 
     function drawBoard($board_array){
 
@@ -114,7 +166,7 @@ $_SESSION["user_message"] = "";
                 } else if($board_array[$i][$j] === "r"){
                     echo '<div><img  class="boardSquare" src="./assets/images/rock.png"></div>';
                 } else if ($board_array[$i][$j] === "g"){
-                    echo '<div><img  class="boardSquare" src="./assets/images/gold.png"></div>';
+                    echo '<div id="gold"><img  class="boardSquare" src="./assets/images/gold.png"></div>';
                 }
                 else 
                     echo '<div><img  class="boardSquare" src="./assets/images/empty.png"></div>';
@@ -124,6 +176,7 @@ $_SESSION["user_message"] = "";
 
         
     }                
+
 ?>
 
 <!DOCTYPE html>
@@ -149,14 +202,14 @@ $_SESSION["user_message"] = "";
                 <div id="navigation">
                     <form method="post">
                         <div id="formDiv">
-                            <div><button name="btnUp" id="btnUp">Up</button></div>
+                            <div><button name="buttons" value="up" id="btnUp">Up</button></div>
                             <div id="btnLeftRight">
-                                <div><button name="btnLeft" id="btnLeft">Left</button></div>
-                                <div><button name="btnRight" id="btnRight">Right</button></div>
+                                <div><button name="buttons" value="left" id="btnLeft">Left</button></div>
+                                <div><button name="buttons" value="right" id="btnRight">Right</button></div>
                             </div>
-                            <div><button name="btnDown" id="btnDown">Down</button></div>
+                            <div><button name="buttons" value="down" id="btnDown">Down</button></div>
                             <div>
-                                <button name="btnReset" id="btnReset">Reset</button>
+                                <button name="btnReset" value="reset" id="btnReset">Reset</button>
                             </div>
                        
                             </div>
