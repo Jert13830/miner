@@ -1,0 +1,83 @@
+#pageContainer{
+    display:flex;
+    align-items: center;
+    justify-content: center;
+    max-height: 100vh;
+ 
+}
+
+
+#mainDisplay{
+    display:flex;
+    width:80vw;
+    justify-content: center;
+    gap:100px;
+}
+
+#pageContainer{
+    display:flex;
+    width: 100vw;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#board{
+    background-color: beige;
+    width : 60vw;
+}
+
+#btnLeftRight{
+    display:flex;
+    gap: 30px;
+}
+
+
+#formDiv{
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+
+}
+
+#navigation{
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+}
+
+#board{
+    display:flex;
+    justify-content: center;
+    width: 50%;
+    flex-wrap: wrap;
+    padding-top:10px;
+}
+
+.boardSquare{
+    width : 85%;
+}
+
+.boardLine{
+    display:flex;
+}
+
+#userMessage{
+    padding-bottom: 5px;
+}
+
+@media only screen and (max-width: 750px) {
+    #mainDisplay{
+        flex-direction: column;
+        gap:50px;
+        align-items: center;
+    }
+
+    #board{
+        width: 80%;
+    }
+}
