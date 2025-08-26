@@ -21,6 +21,7 @@ if (!isset($_SESSION["board_array"])) {
     // Move RIGHT
     if (isset($_POST["btnRight"])){
         $player = getPlayer($_SESSION["board_array"]);
+        if ()
         $_SESSION["board_array"][$player[0]][$player[1]+1]= "m";
         $_SESSION["board_array"][$player[0]][$player[1]]= ""; 
     }
