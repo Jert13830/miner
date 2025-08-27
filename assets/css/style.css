@@ -61,6 +61,21 @@
     
 }
 
+/*#blocks{
+    position:absolute;
+    top: 0;
+    left: 0;
+    transform: translate(0, 0);
+}
+
+.boardBlock{
+    width : 405%;
+}*/
+
+.block{
+    border-radius: 20px;
+}
+
 #userMessage{
   position: absolute;
     top: 50%;

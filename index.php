@@ -75,7 +75,6 @@ function getButtonClick(){
         {
             case 'right':
             
-
                 if ($_SESSION["playerPos"][1]+1 !== count($_SESSION["board_array"][0]) && collision($_SESSION["playerPos"][0],$_SESSION["playerPos"][1]+1)){
                     $_SESSION["board_array"][$_SESSION["playerPos"][0]][$_SESSION["playerPos"][1]+1]= "m";
                     $_SESSION["board_array"][$_SESSION["playerPos"][0]][$_SESSION["playerPos"][1]]= ""; 
@@ -122,6 +121,9 @@ function getButtonClick(){
             showMessage("winner");     
         }
 
+         // Update player position after move
+        $_SESSION["playerPos"] = getPlayer($_SESSION["board_array"]);
+
     }
 }
     
@@ -153,16 +155,41 @@ function getButtonClick(){
     }
 
     function drawBlocks($board_array){
+        echo '<div id="blocks">';
         for ($i=0; $i < count($board_array) ;$i++){
+            echo '<div class="boardLine">';
             for ($j=0; $j < count($board_array[$i]);$j++){
-                if($i = $_SESSION["playerPos"][0] && $j=$_SESSION["playerPos"][1]){
-                    echo '<div><img  class="boardSquare" src="./assets/images/empty.png"></div>';
+                if($i == $_SESSION["playerPos"][0] && $j==$_SESSION["playerPos"][1]){
+                   echo '<div><img class="boardBlock" src="./assets/images/empty.png"></div>';
                 }
                 else{
-                    echo '<div><img  class="boardSquare" src="./assets/images/block.png"></div>';
+                    echo '<div><img class="boardBlock" src="./assets/images/block.png"></div>';
+                   
                 }
             }
         }
+    }
+
+    function playerClose($col,$row): bool{
+        
+        //above
+        if ($col === $_SESSION["playerPos"][0]-1 && $row === $_SESSION["playerPos"][1] ){
+            return true;
+        }
+        //below
+        if ($col === $_SESSION["playerPos"][0]+1 && $row === $_SESSION["playerPos"][1] ){
+            return true;
+        }
+        // left
+        if ($col === $_SESSION["playerPos"][0] && $row === $_SESSION["playerPos"][1]-1 ){
+            return true;
+        }
+        // right
+        if ($col === $_SESSION["playerPos"][0] && $row === $_SESSION["playerPos"][1]+1 ){
+            return true;
+        }
+
+        return false;
     }
 
 
@@ -173,23 +200,24 @@ function getButtonClick(){
             for ($j=0; $j < count($board_array[$i]);$j++){
                 if ($board_array[$i][$j] === "m"){
                     echo '<div><img  class="boardSquare" src="./assets/images/miner.png"></div>';
-                } else if($board_array[$i][$j] === "r"){
+                } else if($board_array[$i][$j] === "r" && playerClose($i,$j)){
                     echo '<div><img  class="boardSquare" src="./assets/images/rock.png"></div>';
-                } else if ($board_array[$i][$j] === "g"){
+                } else if ($board_array[$i][$j] === "g" && playerClose($i,$j)){
                     $showDiv = !$_SESSION["goldFound"];
                     echo '<div class="gold"><img  style="display: ' . (!$_SESSION["goldFound"] ? 'block' : 'none') . ';" class="boardSquare" src="./assets/images/gold.png"></div>';
                     echo '<div class="winner"><img  style="display: ' . (!$_SESSION["goldFound"] ? 'block' : 'none') . ';" class="boardSquare" src="./assets/images/winner.png"></div>';
-                }else if ($board_array[$i][$j] === "w"){
-                     echo '<div><img  class="boardSquare" src="./assets/images/winner.png"></div>';
-                }
-                else 
+                }else if ($board_array[$i][$j] === "" && playerClose($i,$j)){
                     echo '<div><img  class="boardSquare" src="./assets/images/empty.png"></div>';
+                }else {
+                    echo '<div><img  class="boardSquare block" src="./assets/images/block.png"></div>';
                 }
+            }
                 echo '</div>';
         }
 
         
-    }                
+    }
+                    
 
 ?>
 
@@ -207,7 +235,8 @@ function getButtonClick(){
             <div id="mainDisplay">
                 <div id="board">
                     <div>
-                        <?php drawBoard($_SESSION["board_array"])?>
+                            <?php drawBoard($_SESSION["board_array"])?>
+                    
                     </div>
                      <div id="userMessage" style="display: <?php echo $_SESSION["display"]?>">
                         <p id="messageText"><?php echo $_SESSION["user_message"] ?></p>
