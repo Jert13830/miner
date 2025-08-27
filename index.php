@@ -6,7 +6,7 @@
     }
 
    
-    $board_array1 = [["m","","","","r"],
+    /*$board_array1 = [["m","","","","r"],
                     ["r","","r","",""],
                     ["r","","","",""],
                     ["","","","r","r"],
@@ -22,11 +22,13 @@
                     ["r","","g","r","","r"],
                     ["r","","","r","r",""],
                     ["r","","","r","r",""],
-                    ];                
+                    ];                */
+
+    
 
    // Only set the board if it doesn't exist yet
 if (!isset($_SESSION["board_array"])) {
-    $_SESSION["board_array"] = $board_array1;
+    $_SESSION["board_array"] = create_array();
     
 } 
 
@@ -48,6 +50,48 @@ if (isset($_POST["btnReset"])){
     header("Refresh:0");
 }
 
+function create_array(): array {
+
+    // Array
+    $size = rand(5,9);
+    $grid = array_fill(0, $size,array_fill(0,$size,'.'));
+
+    // Player
+    $playerX = rand(0,$size-1);
+    $playerY = rand(0,$size - 1);
+    $grid[$playerY][$playerX] = "m";
+
+    // Gold
+    do{
+        $goldX = rand(0, $size-1);
+        $goldY = rand(0, $size-1);
+    } while ($goldX == $playerX && $goldY == $playerY);
+
+    $grid[$goldY][$goldX] = "g";
+
+    // path
+
+    $x = $playerX;
+    $y = $playerY;
+
+    while ($x != $goldX || $y != $goldY){
+        if($x < $goldX) $x++;
+        elseif ($x > $goldX) $x--;
+        elseif ($y < $goldY) $y++;
+        elseif ($y > $goldY) $y--;
+        if ($grid[$y][$x] == '.') $grid[$y][$x] = ' ';
+    }
+
+    for ($i = 0; $i < $size*$size/3; $i++){
+        $bx = rand(0,$size-1);
+        $by = rand(0, $size-1);
+        if ($grid[$by][$bx]=="."){
+            $grid[$by][$bx] = 'r';
+        }
+    }
+
+    return $grid;
+}
 
 function collision($row, $col): bool {
     switch ($_SESSION["board_array"][$row][$col])
@@ -57,7 +101,6 @@ function collision($row, $col): bool {
             break;
         case 'g' : 
             $_SESSION["goldFound"] = true;
-            $_SESSION["board_array"][$row][$col] = "w";
             return true;
             break;
         default : 
@@ -77,7 +120,7 @@ function getButtonClick(){
             
                 if ($_SESSION["playerPos"][1]+1 !== count($_SESSION["board_array"][0]) && collision($_SESSION["playerPos"][0],$_SESSION["playerPos"][1]+1)){
                     $_SESSION["board_array"][$_SESSION["playerPos"][0]][$_SESSION["playerPos"][1]+1]= "m";
-                    $_SESSION["board_array"][$_SESSION["playerPos"][0]][$_SESSION["playerPos"][1]]= ""; 
+                    $_SESSION["board_array"][$_SESSION["playerPos"][0]][$_SESSION["playerPos"][1]]= "."; 
                 }
                 else
                 {
@@ -88,7 +131,7 @@ function getButtonClick(){
             case 'left':
                 if ($_SESSION["playerPos"][1] !== 0 && collision($_SESSION["playerPos"][0],$_SESSION["playerPos"][1]-1)){
                     $_SESSION["board_array"][$_SESSION["playerPos"][0]][$_SESSION["playerPos"][1]-1]= "m";
-                    $_SESSION["board_array"][$_SESSION["playerPos"][0]][$_SESSION["playerPos"][1]]= ""; 
+                    $_SESSION["board_array"][$_SESSION["playerPos"][0]][$_SESSION["playerPos"][1]]= "."; 
                 }
                 else
                 {
@@ -99,7 +142,7 @@ function getButtonClick(){
             case 'up':
                 if ($_SESSION["playerPos"][0] !== 0 && collision($_SESSION["playerPos"][0]-1,$_SESSION["playerPos"][1])){
                     $_SESSION["board_array"][$_SESSION["playerPos"][0]-1][$_SESSION["playerPos"][1]]= "m";
-                    $_SESSION["board_array"][$_SESSION["playerPos"][0]][$_SESSION["playerPos"][1]]= ""; 
+                    $_SESSION["board_array"][$_SESSION["playerPos"][0]][$_SESSION["playerPos"][1]]= "."; 
                 }else
                 {
                     showMessage("error");
@@ -109,7 +152,7 @@ function getButtonClick(){
             case 'down':
                 if ($_SESSION["playerPos"][0]+1 !== count($_SESSION["board_array"]) && collision($_SESSION["playerPos"][0]+1,$_SESSION["playerPos"][1])){
                     $_SESSION["board_array"][$_SESSION["playerPos"][0]+1][$_SESSION["playerPos"][1]]= "m";
-                    $_SESSION["board_array"][$_SESSION["playerPos"][0]][$_SESSION["playerPos"][1]]= ""; 
+                    $_SESSION["board_array"][$_SESSION["playerPos"][0]][$_SESSION["playerPos"][1]]= "."; 
                 }else
                 {
                     showMessage("error");
@@ -133,7 +176,7 @@ function getButtonClick(){
             $_SESSION["user_message"] = "You can't go in that direction.";
         }
         else{
-             $_SESSION["user_message"] = "Your rich. You hit the JACKPOT!!";
+             $_SESSION["user_message"] = "You're rich. You hit the JACKPOT!!";
         }
         
     }
@@ -167,7 +210,9 @@ function getButtonClick(){
                    
                 }
             }
+            echo '</div>';
         }
+        echo '</div>';
     }
 
     function playerClose($col,$row): bool{
@@ -203,10 +248,12 @@ function getButtonClick(){
                 } else if($board_array[$i][$j] === "r" && playerClose($i,$j)){
                     echo '<div><img  class="boardSquare" src="./assets/images/rock.png"></div>';
                 } else if ($board_array[$i][$j] === "g" && playerClose($i,$j)){
-                    $showDiv = !$_SESSION["goldFound"];
-                    echo '<div class="gold"><img  style="display: ' . (!$_SESSION["goldFound"] ? 'block' : 'none') . ';" class="boardSquare" src="./assets/images/gold.png"></div>';
-                    echo '<div class="winner"><img  style="display: ' . (!$_SESSION["goldFound"] ? 'block' : 'none') . ';" class="boardSquare" src="./assets/images/winner.png"></div>';
-                }else if ($board_array[$i][$j] === "" && playerClose($i,$j)){
+                        // Gold not yet found
+                        echo '<div class="gold"><img style="display: block;" class="boardSquare" src="./assets/images/gold.png"></div>';
+                } else if ($board_array[$i][$j] === "g" && ($_SESSION["playerPos"][0]==$i && $_SESSION["playerPos"][1]==$j)) {
+                        // Winner: player is on gold
+                        echo '<div class="winner"><img style="display: block;" class="boardSquare" src="./assets/images/winner.png"></div>';
+                } else if ($board_array[$i][$j] === "." && playerClose($i,$j)){
                     echo '<div><img  class="boardSquare" src="./assets/images/empty.png"></div>';
                 }else {
                     echo '<div><img  class="boardSquare block" src="./assets/images/block.png"></div>';
@@ -234,10 +281,10 @@ function getButtonClick(){
         <div id="pageContainer">
             <div id="mainDisplay">
                 <div id="board">
-                    <div>
+                   
                             <?php drawBoard($_SESSION["board_array"])?>
                     
-                    </div>
+                  
                      <div id="userMessage" style="display: <?php echo $_SESSION["display"]?>">
                         <p id="messageText"><?php echo $_SESSION["user_message"] ?></p>
                      </div>    
