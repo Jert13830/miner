@@ -54,14 +54,14 @@ function create_array(): array {
 
     // Array
     $size = rand(5,9);
-    $grid = array_fill(0, $size,array_fill(0,$size,'.'));
+    $grid = array_fill(0, $size,array_fill(0,$size,"."));
 
-    // Player
+    // Place Player
     $playerX = rand(0,$size-1);
     $playerY = rand(0,$size - 1);
     $grid[$playerY][$playerX] = "m";
 
-    // Gold
+    // Place Gold
     do{
         $goldX = rand(0, $size-1);
         $goldY = rand(0, $size-1);
@@ -69,24 +69,28 @@ function create_array(): array {
 
     $grid[$goldY][$goldX] = "g";
 
-    // path
+    // Find Path from Player to Gold
+    $pathX = $playerX;
+    $pathY = $playerY;
 
-    $x = $playerX;
-    $y = $playerY;
+    while ($pathX != $goldX || $pathY != $goldY){
+       
+        if($pathX < $goldX) $pathX++;
+        elseif ($pathX > $goldX) $pathX--;
+        elseif ($pathY < $goldY) $pathY++;
+        elseif ($pathY > $goldY) $pathY--;
 
-    while ($x != $goldX || $y != $goldY){
-        if($x < $goldX) $x++;
-        elseif ($x > $goldX) $x--;
-        elseif ($y < $goldY) $y++;
-        elseif ($y > $goldY) $y--;
-        if ($grid[$y][$x] == '.') $grid[$y][$x] = ' ';
+        if ($grid[$pathY][$pathX] == ".") $grid[$pathY][$pathX] = " ";
     }
 
-    for ($i = 0; $i < $size*$size/3; $i++){
-        $bx = rand(0,$size-1);
-        $by = rand(0, $size-1);
-        if ($grid[$by][$bx]=="."){
-            $grid[$by][$bx] = 'r';
+    //Cover a 1/3 of the board with rocks
+    for ($i = 0; $i < $size * $size / 3; $i++){
+
+        $rockX = rand(0,$size-1);
+        $rockY = rand(0, $size-1);
+
+        if ($grid[$rockY][$rockX]=="."){
+            $grid[$rockY][$rockX] = 'r';
         }
     }
 
