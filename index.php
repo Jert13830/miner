@@ -53,7 +53,7 @@ if (isset($_POST["btnReset"])){
 function create_array(): array {
 
     // Array
-    $size = rand(5,9);
+    $size = rand(5,9); //set the array to be a random size between 5 and 9 squares wide or high
     $grid = array_fill(0, $size,array_fill(0,$size,"."));
 
     // Place Player
